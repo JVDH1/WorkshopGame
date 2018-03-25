@@ -1,7 +1,13 @@
+# Deze code vertelt Python welke packages(externe code) er nodig zijn voor dit programma
+# Voor dit programma zijn nodig:
+# - pygame -> voor de visuele elementen van de game, de klok, en voor de toetsenbord invoer
+# - random -> voor het kiezen van een positie van de 'apple'
+# - sys    -> voor het afsluiten van het programma
 import pygame, random, sys
 from pygame.locals import *
 
 
+# Deze functie controleert of er een botsing is tussen item 1 en item 2
 def collide(x1, x2, y1, y2, w1, w2, h1, h2):
     if x1 + w1 > x2 and x1 < x2 + w2 and y1 + h1 > y2 and y1 < y2 + h2:
         return True
@@ -9,71 +15,104 @@ def collide(x1, x2, y1, y2, w1, w2, h1, h2):
         return False
 
 
+# Deze functie bepaalt wat er gebeurt als je af gaat
 def die(screen, score):
-    f = pygame.font.SysFont('Arial', 30);
-    t = f.render('Your score was: ' + str(score), True, (0, 0, 0));
-    screen.blit(t, (10, 270));
-    pygame.display.update();
-    pygame.time.wait(2000);
+    f = pygame.font.SysFont('Arial', 30)
+    t = f.render('Je score was: ' + str(score), True, (0, 0, 0))
+    screen.blit(t, (10, 270))
+    pygame.display.update()
+    pygame.time.wait(2000)
     sys.exit(0)
 
 
-xs = [290, 290, 290, 290, 290]
-ys = [290, 270, 250, 230, 210]
-dirs = 0
-score = 0
-applepos = (random.randint(0, 590), random.randint(0, 590))
-pygame.init()
-s = pygame.display.set_mode((600, 600))
-pygame.display.set_caption('Snake')
-appleimage = pygame.Surface((10, 10))
-appleimage.fill((0, 255, 0))
-img = pygame.Surface((20, 20))
-img.fill((255, 0, 0))
-f = pygame.font.SysFont('Arial', 20)
-clock = pygame.time.Clock()
+# Deze code maakt het programma klaar voor het begin van de game
+xs = [290, 290, 290, 290, 290]                                  # De x-posities van alle stukjes van de snake
+ys = [290, 270, 250, 230, 210]                                  # De y-posities van alle stukjes van de snake
+direction = 0                                                   # De richting waarin de snake beweegt (0 = down, 1 = right, 2 = up, 3 = left)
+score = 0                                                       # De score
+applepos = (random.randint(0, 590), random.randint(0, 590))     # De positie van de 'apple'
+pygame.init()                                                   # Start pygame
+screen = pygame.display.set_mode((600, 600))                    # Het scherm van de game - 600 bij 600 pixels
+pygame.display.set_caption('Snake')                             # De titel van het scherm is 'Snake'
+appleimage = pygame.Surface((10, 10))                           # De 'apple' is een oppervlak van 10 bij 10 pixels
+appleimage.fill((0, 255, 0))                                    # Maak de apple groen
+snakeimage = pygame.Surface((20, 20))                           # Elk stukje van de snake is een oppervlak van 20 bij 20 pixels
+snakeimage.fill((255, 0, 0))                                    # Maak de snake rood
+font = pygame.font.SysFont('Arial', 20)                         # Het lettertype gebruikt in de game
+clock = pygame.time.Clock()                                     # De klok
+
+
+# Dit is de loop met daarin alle instructies voor het runnen van de game
 while True:
+    # Beperk de snelheid van de loop tot 10x per seconde (10 frames per seconde)
     clock.tick(10)
-    for e in pygame.event.get():
-        if e.type == QUIT:
+
+    # Controleer of er een 'event' is geweest, zoals:
+    # - event.type == QUIT -> er is op het kruisje geklikt
+    # - event.type == KEYDOWN en event.key == K_UP -> er is op de up-toets gedrukt
+    for event in pygame.event.get():
+        if event.type == QUIT:
             sys.exit(0)
-        elif e.type == KEYDOWN:
-            if e.key == K_UP and dirs != 0:
-                dirs = 2
-            elif e.key == K_DOWN and dirs != 2:
-                dirs = 0
-            elif e.key == K_LEFT and dirs != 1:
-                dirs = 3
-            elif e.key == K_RIGHT and dirs != 3:
-                dirs = 1
-    i = len(xs) - 1
-    while i >= 2:
-        if collide(xs[0], xs[i], ys[0], ys[i], 20, 20, 20, 20): die(s, score)
-        i -= 1
+        elif event.type == KEYDOWN:
+            if event.key == K_UP and direction != 0:
+                direction = 2
+            elif event.key == K_DOWN and direction != 2:
+                direction = 0
+            elif event.key == K_LEFT and direction != 1:
+                direction = 3
+            elif event.key == K_RIGHT and direction != 3:
+                direction = 1
+
+    # Controleer of de snake botst met zijn staart
+    tail = len(xs) - 1
+    while tail >= 2:
+        if collide(xs[0], xs[tail], ys[0], ys[tail], 20, 20, 20, 20):
+            die(screen, score)
+        tail -= 1
+
+    # Controleer of de snake botst met een apple
     if collide(xs[0], applepos[0], ys[0], applepos[1], 20, 10, 20, 10):
         score += 1
         xs.append(700)
         ys.append(700)
         applepos = (random.randint(0, 590), random.randint(0, 590))
+
+    # Controleer of de snake botst met de rand
     if xs[0] < 0 or xs[0] > 580 or ys[0] < 0 or ys[0] > 580:
-        die(s, score)
-    i = len(xs) - 1
-    while i >= 1:
-        xs[i] = xs[i - 1]
-        ys[i] = ys[i - 1]
-        i -= 1
-    if dirs == 0:
+        die(screen, score)
+
+    # Verplaats elk stukje van de snake naar de positie van het volgende stukje
+    tail = len(xs) - 1
+    while tail >= 1:
+        xs[tail] = xs[tail - 1]
+        ys[tail] = ys[tail - 1]
+        tail -= 1
+
+    # Verplaats de kop van de snake in de richting van de beweging
+    if direction == 0:
         ys[0] += 20
-    elif dirs == 1:
+    elif direction == 1:
         xs[0] += 20
-    elif dirs == 2:
+    elif direction == 2:
         ys[0] -= 20
-    elif dirs == 3:
+    elif direction == 3:
         xs[0] -= 20
-    s.fill((255, 255, 255))
-    for i in range(0, len(xs)):
-        s.blit(img, (xs[i], ys[i]))
-    s.blit(appleimage, applepos)
-    t = f.render(str(score), True, (0, 0, 0))
-    s.blit(t, (10, 10))
+
+    # Maak het scherm wit
+    screen.fill((255, 255, 255))
+
+    # Teken de stukjes snake op de juiste posities
+    for tail in range(0, len(xs)):
+        screen.blit(snakeimage, (xs[tail], ys[tail]))
+
+    # Teken de apple op de juiste positie
+    screen.blit(appleimage, applepos)
+
+    # Creeer de tekst voor de score
+    text = font.render(str(score), True, (0, 0, 0))
+
+    # Teken de tekst op het scherm
+    screen.blit(text, (10, 10))
+
+    # Update het scherm zodat de gebruiker alle veranderingen ziet
     pygame.display.update()
