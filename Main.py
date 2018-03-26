@@ -35,9 +35,9 @@ pygame.init()                                                   # Start pygame
 screen = pygame.display.set_mode((600, 600))                    # Het scherm van de game - 600 bij 600 pixels
 pygame.display.set_caption('Snake')                             # De titel van het scherm is 'Snake'
 appleimage = pygame.Surface((10, 10))                           # De 'apple' is een oppervlak van 10 bij 10 pixels
-appleimage.fill((0, 255, 0))                                    # Maak de apple groen
+appleimage.fill((0, 255, 0))                                    # Maak de apple groen (Red, Green, Blue)
 snakeimage = pygame.Surface((20, 20))                           # Elk stukje van de snake is een oppervlak van 20 bij 20 pixels
-snakeimage.fill((255, 0, 0))                                    # Maak de snake rood
+snakeimage.fill((255, 0, 0))                                    # Maak de snake rood (Red, Green, Blue)
 font = pygame.font.SysFont('Arial', 20)                         # Het lettertype gebruikt in de game
 clock = pygame.time.Clock()                                     # De klok
 
