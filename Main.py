@@ -17,9 +17,9 @@ def collide(x1, x2, y1, y2, w1, w2, h1, h2):
 
 # Deze functie bepaalt wat er gebeurt als je af gaat
 def die(screen, score):
-    f = pygame.font.SysFont('Arial', 30)
-    t = f.render('Je score was: ' + str(score), True, (0, 0, 0))
-    screen.blit(t, (10, 270))
+    font = pygame.font.SysFont('Arial', 30)
+    text = font.render('Je score was: ' + str(score), True, (0, 0, 0))
+    screen.blit(text, (10, 270))
     pygame.display.update()
     pygame.time.wait(2000)
     sys.exit(0)
